@@ -10,12 +10,11 @@
 
   .PARAMETER Action
   The action parameter corresponds to the operation to perform.
-  
   Three values are available:
-  - configure:  configure the application
-  - install:    install the application
-  - show:       display configuration
-  - uninstall:  uninstall the application
+  - configure: configure the application
+  - install: install the application
+  - show: display configuration
+  - uninstall: uninstall the application
 
   .PARAMETER Version
   The optional version parameter allows to overwrite the application version defined in the configuration file.
@@ -28,11 +27,11 @@
   Author:         Florian Carrier
   Creation date:  27/11/2018
   Last modified:  15/01/2020
-  Dependencies:   - PowerShell Tool Kit (PSTK)
+  Dependency:     - PowerShell Tool Kit (PSTK)
                   - WildFly PowerShell Module (PSWF)
 
   .LINK
-  https://github.com/Akaizoku/wildfly-deploy
+  https://svn.wkfs-frc.local/svn/PS/trunk/wildfly-deploy
 
   .LINK
   https://www.powershellgallery.com/packages/PSTK
@@ -173,8 +172,8 @@ Begin {
   # (Re)load environment variables
   Write-Log -Type "DEBUG" -Object "Load environment variables"
   $EnvironmentVariables = @(
-    $Properties.JavaHomeVariable,
-    $Properties.JBossHomeVariable
+    $Properties.JavaHome,
+    $Properties.JBossHome
   )
   foreach ($EnvironmentVariable in $EnvironmentVariables) {
     Sync-EnvironmentVariable -Name $EnvironmentVariable -Scope $Properties.EnvironmentVariableScope | Out-Null
@@ -188,7 +187,7 @@ Begin {
   # General variables
   $Properties.WildFlyDistribution = "wildfly-" + $Properties.WildFlyVersion + ".zip"
   $Properties.JBossHomeDirectory  = Join-Path -Path $Properties.JBossHomeLocation   -ChildPath $Properties.WildFlyDistribution.Replace(".zip", "")
-  $Properties.JBossClient         = Join-Path -Path $Properties.JBossHomeDirectory  -ChildPath "bin\jboss-cli.ps1"
+  $Properties.JBossCli            = Join-Path -Path $Properties.JBossHomeDirectory  -ChildPath $Properties.JBossCli
   $Properties.ServiceName         = $ServiceProperties.SHORTNAME
   $Properties.Hostname            = Get-EnvironmentVariable -Name "ComputerName" -Scope "Process"
   $Properties.Protocol            = "HTTP"
