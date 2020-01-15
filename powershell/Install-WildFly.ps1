@@ -53,14 +53,14 @@ function Install-WildFly {
   Process {
     Write-Log -Type "INFO" -Object "Installation of WildFly $($Properties.WildFlyVersion)"
     # Check if JAVA_HOME is set
-    if (Test-EnvironmentVariable -Variable $Properties.JavaHome -Scope $Properties.EnvironmentVariableScope) {
+    if (Test-EnvironmentVariable -Variable $Properties.JavaHomeVariable -Scope $Properties.EnvironmentVariableScope) {
       # Check if Java is installed
-      $JavaPath = Get-EnvironmentVariable -Variable $Properties.JavaHome -Scope $Properties.EnvironmentVariableScope
+      $JavaPath = Get-EnvironmentVariable -Variable $Properties.JavaHomeVariable -Scope $Properties.EnvironmentVariableScope
       if (-Not (Test-Path -Path $JavaPath)) {
-        Write-Log -Type "ERROR" -Object "$($Properties.JavaHome) path not found $JavaPath" -ExitCode 1
+        Write-Log -Type "ERROR" -Object "$($Properties.JavaHomeVariable) path not found $JavaPath" -ExitCode 1
       }
     } else {
-      Write-Log -Type "ERROR" -Object "$($Properties.JavaHome) environment variable is not set" -ExitCode 1
+      Write-Log -Type "ERROR" -Object "$($Properties.JavaHomeVariable) environment variable is not set" -ExitCode 1
     }
     # --------------------------------------------------------------------------
     # Check that WildFly is not already installed
@@ -75,7 +75,7 @@ function Install-WildFly {
       $Continue = $false
     }
     # Check if JBOSS_HOME variable is defined
-    if (Test-EnvironmentVariable -Variable $Properties.JBossHome -Scope $Properties.EnvironmentVariableScope) {
+    if (Test-EnvironmentVariable -Variable $Properties.JBossHomeVariable -Scope $Properties.EnvironmentVariableScope) {
       Write-Log -Type "WARN" -Object "The environment variable $($Properties.JBossHome) is already defined"
       $Continue = $false
     }
@@ -105,7 +105,7 @@ function Install-WildFly {
     # --------------------------------------------------------------------------
     # Set JBOSS_HOME environment variable
     Write-Log -Type "INFO" -Object "Configuring ""$($Properties.JBossHome)"" environment variable"
-    Set-EnvironmentVariable -Variable $Properties.JBossHome -Value $Properties.JBossHomeDirectory -Scope $Properties.EnvironmentVariableScope
+    Set-EnvironmentVariable -Variable $Properties.JBossHomeVariable -Value $Properties.JBossHomeDirectory -Scope $Properties.EnvironmentVariableScope
     # --------------------------------------------------------------------------
     # Configure WildFly
     Set-WildFlyConfiguration -Properties $Properties -Unattended:$Unattended

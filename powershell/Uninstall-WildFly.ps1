@@ -49,8 +49,8 @@ function Uninstall-WildFly {
     Uninstall-WildFlyService -Properties $Properties -Unattended:$Unattended
     # --------------------------------------------------------------------------
     # Check environment variable
-    if (Test-EnvironmentVariable -Variable $Properties.JBossHome -Scope $Properties.EnvironmentVariableScope) {
-      $JBossHomeVariable = Get-EnvironmentVariable -Variable $Properties.JBossHome -Scope $Properties.EnvironmentVariableScope
+    if (Test-EnvironmentVariable -Variable $Properties.JBossHomeVariable -Scope $Properties.EnvironmentVariableScope) {
+      $JBossHomeVariable = Get-EnvironmentVariable -Variable $Properties.JBossHomeVariable -Scope $Properties.EnvironmentVariableScope
       if (Test-Path -Path $JBossHomeVariable) {
         if ($JBossHomeVariable -ne $Properties.JBossHomeDirectory) {
           Write-Log -Type "WARN" -Object "The $($Properties.JBossHome) environment variable points to a different installation"
@@ -72,21 +72,21 @@ function Uninstall-WildFly {
             }
             # Remove environment variable
             Write-Log -Type "INFO" -Object "Removing $($Properties.JBossHome) environment variable"
-            Remove-EnvironmentVariable -Variable $Properties.JBossHome -Scope $Properties.EnvironmentVariableScope -Confirm:$Attended
+            Remove-EnvironmentVariable -Variable $Properties.JBossHomeVariable -Scope $Properties.EnvironmentVariableScope -Confirm:$Attended
           }
         } else {
           # Remove environment variable
           Write-Log -Type "INFO" -Object "Removing $($Properties.JBossHome) environment variable"
-          Remove-EnvironmentVariable -Variable $Properties.JBossHome -Scope $Properties.EnvironmentVariableScope -Confirm:$Attended
+          Remove-EnvironmentVariable -Variable $Properties.JBossHomeVariable -Scope $Properties.EnvironmentVariableScope -Confirm:$Attended
         }
       } else {
         Write-Log -Type "WARN" -Object "$($Properties.JBossHome) path not found $JBossHomeVariable"
         if ($Attended) {
-          $Delete = Confirm-Prompt -Prompt "Do you want to remove the $Properties.JBossHome environment variable?"
+          $Delete = Confirm-Prompt -Prompt "Do you want to remove the $Properties.JBossHomeVariable environment variable?"
         }
         if ($Unattended -Or $Delete) {
           Write-Log -Type "INFO" -Object "Removing $($Properties.JBossHome) environment variable"
-          Remove-EnvironmentVariable -Variable $Properties.JBossHome -Scope $Properties.EnvironmentVariableScope
+          Remove-EnvironmentVariable -Variable $Properties.JBossHomeVariable -Scope $Properties.EnvironmentVariableScope
         }
       }
     } else {

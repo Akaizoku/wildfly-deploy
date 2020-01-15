@@ -16,7 +16,7 @@ function Invoke-ConfigureWildFly {
     File name:      Invoke-ConfigureWildFly.ps1
     Author:         Florian Carrier
     Creation date:  10/01/2020
-    Last modified:  10/01/2020
+    Last modified:  15/01/2020
   #>
   [CmdletBinding (
     SupportsShouldProcess = $true
@@ -53,12 +53,13 @@ function Invoke-ConfigureWildFly {
     if (-Not (Test-Path -Path $Properties.JBossHomeDirectory)) {
       Write-Log -Type "WARN" -Object "Path not found $($Properties.JBossHomeDirectory)"
       # Check if JBOSS_HOME environment variable is defined
-      if (Test-EnvironmentVariable -Name $Properties.JBossHome -Scope $Properties.EnvironmentVariableScope) {
-        $JBossHome = Get-EnvironmentVariable -Name $Properties.JBossHome -Scope $Properties.EnvironmentVariableScope
+      if (Test-EnvironmentVariable -Name $Properties.JBossHomeVariable -Scope $Properties.EnvironmentVariableScope) {
+        $JBossHome = Get-EnvironmentVariable -Name $Properties.JBossHomeVariable -Scope $Properties.EnvironmentVariableScope
         # Check that JBOSS_HOME path is valid
         if (Test-Path -Path $JBossHome) {
           Write-Log -Type "WARN" -Object "Using $($Properties.JBossHome) environment variable"
-          $Properties.JBossHomeDirectory = $JBossHome
+          $Properties.JBossHomeDirectory  = $JBossHome
+          $Properties.JBossClient         = Join-Path -Path $Properties.JBossHomeDirectory -ChildPath "/bin/jboss-cli.ps1"
         } else {
           Write-Log -Type "WARN" -Object "$($Properties.JBossHome) environment variable points to an invalid location"
           if ($Attended) {
@@ -66,7 +67,7 @@ function Invoke-ConfigureWildFly {
           }
           # Remove JBOSS_HOME environment variable
           if ($Confirm -Or $Unattended) {
-            Remove-EnvironmentVariable -Name $Properties.JBossHome -Scope $Properties.EnvironmentVariableScope
+            Remove-EnvironmentVariable -Name $Properties.JBossHomeVariable -Scope $Properties.EnvironmentVariableScope
           }
           # Stop process
           Write-Log -Type "ERROR" -Object "No installation of WildFly was detected" -ExitCode 1
@@ -99,7 +100,7 @@ function Invoke-ConfigureWildFly {
     # Wait for web-server to come back up
     # Get admin credentials
     $AdminCredentials = Get-AdminCredentials -Properties $Properties -Unattended:$Unattended
-    $Running = Wait-WildFly -Path $Properties.JBossCli -Controller $Properties.Controller -Credentials $AdminCredentials -TimeOut 60 -RetryInterval 1
+    $Running = Wait-WildFly -Path $Properties.JBossClient -Controller $Properties.Controller -Credentials $AdminCredentials -TimeOut 60 -RetryInterval 1
     if (-Not $Running) {
       Write-Log -Type "ERROR" -Object "Timeout. $($WebServer.Name) could not be restarted" -ExitCode 1
     }
