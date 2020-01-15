@@ -172,8 +172,8 @@ Begin {
   # (Re)load environment variables
   Write-Log -Type "DEBUG" -Object "Load environment variables"
   $EnvironmentVariables = @(
-    $Properties.JavaHome,
-    $Properties.JBossHome
+    $Properties.JavaHomeVariable,
+    $Properties.JBossHomeVariable
   )
   foreach ($EnvironmentVariable in $EnvironmentVariables) {
     Sync-EnvironmentVariable -Name $EnvironmentVariable -Scope $Properties.EnvironmentVariableScope | Out-Null
