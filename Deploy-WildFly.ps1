@@ -90,7 +90,7 @@ Begin {
   # Global preferences
   # ----------------------------------------------------------------------------
   # $ErrorActionPreference = "Stop"
-  $DebugPreference = "Continue"
+  # $DebugPreference = "Continue"
   # Set-StrictMode -Version Latest
 
   # ----------------------------------------------------------------------------
