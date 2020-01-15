@@ -59,7 +59,7 @@ function Set-PortNumbers {
     # Set port offset
     Write-Log -Type "INFO" -Object "Configuring standard socket port offset"
     if (Set-PortOffset -Path $StandaloneXML -Group 'standard-sockets' -Value $Properties.PortOffset) {
-      Write-Log -Type "DEBUG" -Object "Standard socket port offset configured successfully"
+      # Write-Log -Type "CHECK" -Object "Standard socket port offset configured successfully"
     } else {
       Write-Log -Type "ERROR" -Object "Standard socket port offset could not be configured" -ExitCode 1
     }
@@ -69,7 +69,7 @@ function Set-PortNumbers {
       # Set port number
       Write-Log -Type "INFO" -Object "Configuring $($Socket.Name) socket"
       if (Set-PortNumber -Path $StandaloneXML -Name $Socket.Name -Value $Socket.Value) {
-        # Write-Log -Type "DEBUG" -Object "Socket ""$($Socket.Name)"" configured successfully"
+        # Write-Log -Type "CHECK" -Object "Socket ""$($Socket.Name)"" configured successfully"
       } else {
         Write-Log -Type "WARN" -Object "Socket ""$($Socket.Name)"" could not be configured"
         $Success = $false
