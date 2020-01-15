@@ -31,7 +31,7 @@
                   - WildFly PowerShell Module (PSWF)
 
   .LINK
-  https://svn.wkfs-frc.local/svn/PS/trunk/wildfly-deploy
+  https://github.com/Akaizoku/wildfly-deploy
 
   .LINK
   https://www.powershellgallery.com/packages/PSTK

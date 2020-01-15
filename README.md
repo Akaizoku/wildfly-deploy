@@ -1,6 +1,6 @@
-# WildFly-deploy
+# WildFly deployment utlity
 
-WildFly deploy is a small PowerShell utility that offers an automation framework to quickly and easily setup a web-server on a local machine.
+`wildfly-deploy` is a small PowerShell utility that offers an automation framework to quickly and easily setup a web-server on a local machine.
 
 ## Table of contents
 
@@ -12,6 +12,7 @@ WildFly deploy is a small PowerShell utility that offers an automation framework
     1.  [Permissions](#permissions)
     2.  [PowerShell version](#powershell-version)
     3.  [PowerShell Tool Kit](#powershell-tool-kit)
+    4.  [WildFly PowerShell Module](#wildfly-powershell-module)
 4.  [Configuration](#configuration)
     1.  [Script configuration](#script-configuration)
     2.  [Service configuration](#service-configuration)
@@ -23,11 +24,11 @@ WildFly deploy is a small PowerShell utility that offers an automation framework
         2.  [Install](#install)
         3.  [Show](#show)
         4.  [Uninstall](#uninstall)
-    2.  [Unattended](#unattended)
+    2.  [Version](#version)
+    3.  [Unattended](#unattended)
 6.  [Known issues](#known-issues)
     1.  [Failure to remove files](#failure-to-remove-files)
 7.  [Roadmap](#roadmap)
-8.  [Contact](#contact)
 
 <!-- /TOC -->
 
@@ -61,7 +62,19 @@ This script makes use of functions from the [PowerShell Tool Kit (PSTK)](https:/
 +---conf
 +---lib
 |   \---PSTK
-+---logs
++---powershell
+\---res
+```
+
+### WildFly PowerShell Module
+
+This script requires the [WildFly PowerShell Module (PSWF)](https://www.powershellgallery.com/packages/PSWF) module. It must be installed on the local machine or copied in a `lib` folder at the root of the directory.
+
+```
+.wildfly-deploy
++---conf
++---lib
+|   \---PSWF
 +---powershell
 \---res
 ```
@@ -135,6 +148,10 @@ The _show_ option will display the configuration of the script.
 
 The _uninstall_ option will remove an existing instance of WildFly from the local machine.
 
+### Version
+
+The optional _version_ parameter allows you to specify the version of WildFly to deploy dynamically without having to edit the configuration file. It takes precedence over the values defined in `custom.ini` and `default.ini`.
+
 ### Unattended
 
 The _unattended_ switch allows you to run the script in silent mode without any interaction. This relies on all configuration properties having been properly defined, especially the admin user credentials.
@@ -154,7 +171,3 @@ This can be due to multiple causes:
 
 -   [ ] Enable HTTPS configuration
 -   [ ] Enable LDAP configuration
-
-## Contact
-
-In case of any issue please contact Florian Carrier: [florian.carrier@wolterskluwer.com](mailto:florian.carrier@wolterskluwer.com)
