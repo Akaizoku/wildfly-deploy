@@ -97,6 +97,7 @@ function Wait-WildFly {
     # Check timer
     if (($Timer.Elapsed.TotalSeconds -gt $TimeOut) -And (-Not $Running)) {
       # Timeout
+      Write-Log -Type "WARN" -Object "Timeout"
       return $false
     } else {
       return $true

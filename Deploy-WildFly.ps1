@@ -11,10 +11,14 @@
   .PARAMETER Action
   The action parameter corresponds to the operation to perform.
   Three values are available:
-  - configure: configure the application
-  - install: install the application
-  - show: display configuration
-  - uninstall: uninstall the application
+  - configure:  configure the application server
+  - install:    install the application server
+  - reload:     reload the application server
+  - restart:    restart the application server
+  - show:       display script configuration
+  - start:      start the application server
+  - stop:       stop the application server
+  - uninstall:  uninstall the application server
 
   .PARAMETER Version
   The optional version parameter allows to overwrite the application version defined in the configuration file.
@@ -26,7 +30,7 @@
   File name:      Deploy-WildFly.psm1
   Author:         Florian Carrier
   Creation date:  27/11/2018
-  Last modified:  15/01/2020
+  Last modified:  16/01/2020
   Dependency:     - PowerShell Tool Kit (PSTK)
                   - WildFly PowerShell Module (PSWF)
 
@@ -54,7 +58,11 @@ Param (
   [ValidateSet (
     "configure",
     "install",
+    "reload",
+    "restart",
     "show",
+    "start",
+    "stop",
     "uninstall"
   )]
   [String]
@@ -90,7 +98,7 @@ Begin {
   # Global preferences
   # ----------------------------------------------------------------------------
   # $ErrorActionPreference = "Stop"
-  # $DebugPreference = "Continue"
+  $DebugPreference = "Continue"
   # Set-StrictMode -Version Latest
 
   # ----------------------------------------------------------------------------
@@ -186,8 +194,9 @@ Begin {
 
   # General variables
   $Properties.WildFlyDistribution = "wildfly-" + $Properties.WildFlyVersion + ".zip"
-  $Properties.JBossHomeDirectory  = Join-Path -Path $Properties.JBossHomeLocation   -ChildPath $Properties.WildFlyDistribution.Replace(".zip", "")
-  $Properties.JBossCli            = Join-Path -Path $Properties.JBossHomeDirectory  -ChildPath $Properties.JBossCli
+  $Properties.JBossHomeDirectory  = Join-Path -Path $Properties.JBossHomeLocation -ChildPath $Properties.WildFlyDistribution.Replace(".zip", "")
+  # TODO use batch (or shell) if version < 9
+  $Properties.JBossClient         = Join-Path -Path $Properties.JBossHomeDirectory -ChildPath "bin\jboss-cli.ps1"
   $Properties.ServiceName         = $ServiceProperties.SHORTNAME
   $Properties.Hostname            = Get-EnvironmentVariable -Name "ComputerName" -Scope "Process"
   $Properties.Protocol            = "HTTP"
@@ -198,33 +207,15 @@ Begin {
 Process {
   # Check operation to perform
   switch ($Action) {
-    "install"   {
-      Install-WildFly -Properties $Properties -Unattended:$Unattended
-    }
-    # --------------------------------------------------------------------------
-    "uninstall" {
-      Uninstall-WildFly -Properties $Properties -Unattended:$Unattended
-    }
-    # --------------------------------------------------------------------------
-    "configure" {
-      Invoke-ConfigureWildFly -Properties $Properties -Unattended:$Unattended
-    }
-    # --------------------------------------------------------------------------
-    "show" {
-      # Display default x custom script configuration
-      Write-Log -Type "INFO" -Object "Script configuration"
-      Write-Host -Object ($Properties | Out-String).Trim() -ForegroundColor "Cyan"
-      # Display service configuration
-      Write-Log -Type "INFO" -Object "Service configuration"
-      Write-Host -Object ($ServiceProperties | Out-String).Trim() -ForegroundColor "Cyan"
-      # Display JVM configuration
-      Write-Log -Type "INFO" -Object "Java options"
-      Write-Host -Object ($JavaOptions | Out-String).Trim() -ForegroundColor "Cyan"
-    }
-    # --------------------------------------------------------------------------
-    default {
-      Write-Log -Type "ERROR" -Object "Operation not supported" -ExitCode 1
-    }
+    "install"   { Install-WildFly         -Properties $Properties -Unattended:$Unattended }
+    "uninstall" { Uninstall-WildFly       -Properties $Properties -Unattended:$Unattended }
+    "configure" { Invoke-ConfigureWildFly -Properties $Properties -Unattended:$Unattended }
+    "reload"    { Invoke-ReloadWildFly    -Properties $Properties -Unattended:$Unattended }
+    "restart"   { Invoke-RestartWildFly   -Properties $Properties -Unattended:$Unattended }
+    "start"     { Invoke-StartWildFly     -Properties $Properties -Unattended:$Unattended }
+    "stop"      { Invoke-StopWildFly      -Properties $Properties -Unattended:$Unattended }
+    "show"      { Show-Configuration      -Properties $Properties -Unattended:$Unattended }
+    default     { Write-Log -Type "ERROR" -Object "Operation not supported" -ExitCode 1   }
   }
 }
 

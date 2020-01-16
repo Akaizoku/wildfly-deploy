@@ -119,7 +119,7 @@ function Install-WildFly {
     # Wait for web-server to come back up
     $Running  = Wait-WildFly -Path $JBossClient -Controller $Properties.Controller -TimeOut 60 -RetryInterval 1
     if (-Not $Running) {
-      Write-Log -Type "ERROR" -Object "Timeout. $($WebServer.Name) could not be started" -ExitCode 1
+      Write-Log -Type "ERROR" -Object "WildFly could not be started" -ExitCode 1
     }
     # --------------------------------------------------------------------------
     # Get admin credentials

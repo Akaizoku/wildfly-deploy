@@ -1,10 +1,10 @@
-function Invoke-ConfigureWildFly {
+function Invoke-ReloadWildFly {
   <#
     .SYNOPSIS
-    Configure WildFly
+    Reload WildFly
 
     .DESCRIPTION
-    Configure a WildFly instance
+    Reload a WildFly instance
 
     .PARAMETER Properties
     The properties parameter corresponds to the application configuration.
@@ -13,10 +13,11 @@ function Invoke-ConfigureWildFly {
     The unattended switch defines if the script should run in non-interactive mode.
 
     .NOTES
-    File name:      Invoke-ConfigureWildFly.ps1
+    File name:      Invoke-ReloadWildFly.ps1
     Author:         Florian Carrier
-    Creation date:  10/01/2020
-    Last modified:  15/01/2020
+    Creation date:  16/01/2020
+    Last modified:  16/01/2020
+    TODO            Handle exception "WFLYCTL0343: The service container has been destabilized by a previous operation and further runtime updates cannot be processed. Restart is required."
   #>
   [CmdletBinding (
     SupportsShouldProcess = $true
@@ -39,14 +40,8 @@ function Invoke-ConfigureWildFly {
   Begin {
     # Get global preference variables
     Get-CallerPreference -Cmdlet $PSCmdlet -SessionState $ExecutionContext.SessionState
-    # Interactive mode
-    $Attended = -Not $Unattended
-    # Role-based access control model switch
-    if ($Properties.EnableRBAC -eq "true") {
-      $EnableRBAC = $true
-    } else {
-      $EnableRBAC = $false
-    }
+    # Define number of reties
+    $RetryCount = 3
   }
   Process {
     # Check that WildFly is installed
@@ -78,42 +73,32 @@ function Invoke-ConfigureWildFly {
       }
     }
     # --------------------------------------------------------------------------
-    # Check if service is defined
-    if (-Not (Test-Service -Service $Properties.ServiceName)) {
-      Write-Log -Type "ERROR" -Object "WildFly Windows service ""$($Properties.ServiceName)"" could not be found" -ExitCode 1
-    }
-    # --------------------------------------------------------------------------
-    Write-Log -Type "INFO" -Object "Configuration of WildFly $($Properties.WildFlyVersion)"
-    # Check service status
-    $ServiceStatus = Get-Service -Name $Properties.ServiceName | Select-Object -ExpandProperty "Status"
-    # Stop service if running
-    if ($ServiceStatus -eq "Running") {
-      Write-Log -Type "INFO" -Object "Stopping WildFly"
-      Stop-Service -Name $Properties.ServiceName -Force -Confirm:$Attended
-    }
-    # Configure WildFly
-    Set-WildFlyConfiguration -Properties $Properties -Unattended:$Unattended
-    # --------------------------------------------------------------------------
-    # Restart service to apply changes
-    Write-Log -Type "DEBUG" -Object "Re-starting WildFly"
-    Restart-Service -Name $Properties.ServiceName -Confirm:$Attended
-    # Wait for web-server to come back up
+    Write-Log -Type "INFO" -Object "Reloading WildFly"
     # Get admin credentials
     $AdminCredentials = Get-AdminCredentials -Properties $Properties -Unattended:$Unattended
-    $Running = Wait-WildFly -Path $Properties.JBossClient -Controller $Properties.Controller -Credentials $AdminCredentials -TimeOut 60 -RetryInterval 1
-    if (-Not $Running) {
-      Write-Log -Type "ERROR" -Object "$($WebServer.Name) could not be restarted" -ExitCode 1
+    for ($i=0; $i -le $RetryCount; $i++) {
+      # Reload server
+      $Reload = Invoke-ReloadServer -Path $Properties.JBossClient -Controller $Properties.Controller -Credentials $AdminCredentials
+      # Check outcome
+      if (-Not (Test-JBossClientOutcome -Log $Reload)) {
+        # Check if java.util.concurrent.CancellationException
+        if (Select-String -InputObject $Reload -Pattern "java.util.concurrent.CancellationException" -SimpleMatch -Quiet) {
+          # Wait and try again
+          Start-Sleep -Seconds 1
+        } else {
+          Write-Log -Type "WARN"  -Object "WildFly could not be reloaded"
+          Write-Log -Type "ERROR" -Object $Reload -ExitCode 1
+        }
+      } else {
+        # Wait for web-server to come back up
+        $Running = Wait-WildFly -Path $Properties.JBossClient -Controller $Properties.Controller -Credentials $AdminCredentials -TimeOut 300 -RetryInterval 1
+        if (-Not $Running) {
+          Write-Log -Type "ERROR" -Object "WildFly failed to come back up" -ExitCode 1
+        }
+        break
+      }
     }
     # --------------------------------------------------------------------------
-    # Configure security
-    Set-SecurityModel -JBossHome $Properties.JBossHomeDirectory -Controller $Properties.Controller -Credentials $AdminCredentials -RBAC:$EnableRBAC
-    # --------------------------------------------------------------------------
-    Write-Log -Type "INFO" -Object "Re-starting WildFly"
-    # WARNING Wait 3 seconds to prevent issue causing WildFly service start operation to fail when WildFly is still loading in the background
-    Start-Sleep -Seconds 3
-    # Restart service
-    Restart-Service -Name $Properties.ServiceName -Confirm:$Attended
-    # --------------------------------------------------------------------------
-    Write-Log -Type "CHECK" -Object "WildFly $($Properties.WildFlyVersion) configuration complete"
+    Write-Log -Type "CHECK" -Object "WildFly reload complete"
   }
 }
