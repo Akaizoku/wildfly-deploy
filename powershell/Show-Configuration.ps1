@@ -9,14 +9,17 @@ function Show-Configuration {
     .PARAMETER Properties
     The properties parameter corresponds to the application configuration.
 
-    .PARAMETER Unattended
-    The unattended switch defines if the script should run in non-interactive mode.
+    .PARAMETER ServiceProperties
+    The service properties parameter corresponds to the configuration of the service.
+
+    .PARAMETER JavaOptions
+    The Java options parameter corresponds to the configuration of the Java Virtual Machine (JVM).
 
     .NOTES
     File name:      Show-Configuration.ps1
     Author:         Florian Carrier
     Creation date:  16/01/2020
-    Last modified:  16/01/2020
+    Last modified:  17/01/2020
   #>
   [CmdletBinding (
     SupportsShouldProcess = $true
@@ -25,16 +28,27 @@ function Show-Configuration {
     [Parameter (
       Position    = 1,
       Mandatory   = $true,
-      HelpMessage = "List of properties"
+      HelpMessage = "Script configuration"
     )]
     [ValidateNotNullOrEmpty ()]
     [System.Collections.Specialized.OrderedDictionary]
     $Properties,
     [Parameter (
-      HelpMessage = "No interaction mode"
+      Position    = 2,
+      Mandatory   = $true,
+      HelpMessage = "Service configuration"
     )]
-    [Switch]
-    $Unattended
+    [ValidateNotNullOrEmpty ()]
+    [System.Collections.Specialized.OrderedDictionary]
+    $ServiceProperties,
+    [Parameter (
+      Position    = 3,
+      Mandatory   = $true,
+      HelpMessage = "Java options"
+    )]
+    [ValidateNotNullOrEmpty ()]
+    [String]
+    $JavaOptions
   )
   Begin {
     # Get global preference variables
