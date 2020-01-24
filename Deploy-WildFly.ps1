@@ -30,7 +30,7 @@
   File name:      Deploy-WildFly.psm1
   Author:         Florian Carrier
   Creation date:  27/11/2018
-  Last modified:  16/01/2020
+  Last modified:  17/01/2020
   Dependency:     - PowerShell Tool Kit (PSTK)
                   - WildFly PowerShell Module (PSWF)
 
@@ -194,7 +194,7 @@ Begin {
 
   # General variables
   $Properties.WildFlyDistribution = "wildfly-" + $Properties.WildFlyVersion + ".zip"
-  $Properties.JBossHomeDirectory  = Join-Path -Path $Properties.JBossHomeLocation -ChildPath $Properties.WildFlyDistribution.Replace(".zip", "")
+  $Properties.JBossHomeDirectory  = Join-Path -Path $Properties.InstallationPath -ChildPath $Properties.WildFlyDistribution.Replace(".zip", "")
   # TODO use batch (or shell) if version < 9
   $Properties.JBossClient         = Join-Path -Path $Properties.JBossHomeDirectory -ChildPath "bin\jboss-cli.ps1"
   $Properties.ServiceName         = $ServiceProperties.SHORTNAME
@@ -207,18 +207,19 @@ Begin {
 Process {
   # Check operation to perform
   switch ($Action) {
-    "install"   { Install-WildFly         -Properties $Properties -Unattended:$Unattended }
-    "uninstall" { Uninstall-WildFly       -Properties $Properties -Unattended:$Unattended }
-    "configure" { Invoke-ConfigureWildFly -Properties $Properties -Unattended:$Unattended }
-    "reload"    { Invoke-ReloadWildFly    -Properties $Properties -Unattended:$Unattended }
-    "restart"   { Invoke-RestartWildFly   -Properties $Properties -Unattended:$Unattended }
-    "start"     { Invoke-StartWildFly     -Properties $Properties -Unattended:$Unattended }
-    "stop"      { Invoke-StopWildFly      -Properties $Properties -Unattended:$Unattended }
-    "show"      { Show-Configuration      -Properties $Properties -Unattended:$Unattended }
-    default     { Write-Log -Type "ERROR" -Object "Operation not supported" -ExitCode 1   }
+    "configure" { Invoke-ConfigureWildFly -Properties $Properties -Unattended:$Unattended                                         }
+    "install"   { Install-WildFly         -Properties $Properties -Unattended:$Unattended                                         }
+    "reload"    { Invoke-ReloadWildFly    -Properties $Properties -Unattended:$Unattended                                         }
+    "restart"   { Invoke-RestartWildFly   -Properties $Properties -Unattended:$Unattended                                         }
+    "show"      { Show-Configuration      -Properties $Properties -ServiceProperties $ServiceProperties -JavaOptions $JavaOptions }
+    "start"     { Invoke-StartWildFly     -Properties $Properties -Unattended:$Unattended                                         }
+    "stop"      { Invoke-StopWildFly      -Properties $Properties -Unattended:$Unattended                                         }
+    "uninstall" { Uninstall-WildFly       -Properties $Properties -Unattended:$Unattended                                         }
+    default     { Write-Log -Type "ERROR" -Object "Operation not supported" -ExitCode 1                                           }
   }
 }
 
 End {
+  # Stop script and transcript
   Stop-Script -ExitCode 0
 }

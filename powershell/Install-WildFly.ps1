@@ -126,6 +126,7 @@ function Install-WildFly {
     $AdminCredentials = Get-AdminCredentials -Properties $Properties -Unattended:$Unattended
     # Configure security
     Set-SecurityModel -JBossHome $Properties.JBossHomeDirectory -Controller $Properties.Controller -Credentials $AdminCredentials -RBAC:$EnableRBAC
+    # --------------------------------------------------------------------------
     # Restart WildFly to apply changes
     Write-Log -Type "INFO" -Object "Reloading WildFly"
     $Reload = Invoke-ReloadServer -Path $JBossClient -Controller $Properties.Controller -Credentials $AdminCredentials
