@@ -106,7 +106,7 @@ Begin {
   # ----------------------------------------------------------------------------
   # General
   $ScriptName         = [System.IO.Path]::GetFileNameWithoutExtension($MyInvocation.MyCommand.Name)
-  $ISOTimeStamp       = Get-Date -Format "dd-MM-yyyy_HHmmss"
+  $ISOTimeStamp       = Get-Date -Format "yyyy-MM-dd_HHmmss"
 
   # Configuration
   $LibDirectory       = Join-Path -Path $PSScriptRoot -ChildPath "lib"
