@@ -30,8 +30,8 @@
   File name:      Deploy-WildFly.psm1
   Author:         Florian Carrier
   Creation date:  27/11/2018
-  Last modified:  17/01/2020
-  Dependency:     - PowerShell Tool Kit (PSTK)
+  Last modified:  10/02/2020
+  Dependencies:   - PowerShell Tool Kit (PSTK)
                   - WildFly PowerShell Module (PSWF)
 
   .LINK
@@ -106,7 +106,7 @@ Begin {
   # ----------------------------------------------------------------------------
   # General
   $ScriptName         = [System.IO.Path]::GetFileNameWithoutExtension($MyInvocation.MyCommand.Name)
-  $ISOTimeStamp       = Get-Date -Format "dd-MM-yyyy_HHmmss"
+  $ISOTimeStamp       = Get-Date -Format "yyyy-MM-dd_HHmmss"
 
   # Configuration
   $LibDirectory       = Join-Path -Path $PSScriptRoot -ChildPath "lib"
@@ -200,7 +200,7 @@ Begin {
   $Properties.ServiceName         = $ServiceProperties.SHORTNAME
   $Properties.Hostname            = Get-EnvironmentVariable -Name "ComputerName" -Scope "Process"
   $Properties.Protocol            = "HTTP"
-  $Properties.ManagementPort      = $Properties.HTTPManagementPort
+  $Properties.ManagementPort      = [System.Int32]$Properties.HTTPManagementPort + [System.Int32]$Properties.PortOffset
   $Properties.Controller          = $Properties.Hostname + ':' + $Properties.ManagementPort
 }
 

@@ -76,7 +76,7 @@ function Install-WildFly {
     }
     # Check if JBOSS_HOME variable is defined
     if (Test-EnvironmentVariable -Variable $Properties.JBossHomeVariable -Scope $Properties.EnvironmentVariableScope) {
-      Write-Log -Type "WARN" -Object "The environment variable $($Properties.JBossHome) is already defined"
+      Write-Log -Type "WARN" -Object "The environment variable $($Properties.JBossHomeVariable) is already defined"
       $Continue = $false
     }
     # Cancel installation if issues detected
@@ -104,7 +104,7 @@ function Install-WildFly {
     }
     # --------------------------------------------------------------------------
     # Set JBOSS_HOME environment variable
-    Write-Log -Type "INFO" -Object "Configuring ""$($Properties.JBossHome)"" environment variable"
+    Write-Log -Type "INFO" -Object "Configuring ""$($Properties.JBossHomeVariable)"" environment variable"
     Set-EnvironmentVariable -Variable $Properties.JBossHomeVariable -Value $Properties.JBossHomeDirectory -Scope $Properties.EnvironmentVariableScope
     # --------------------------------------------------------------------------
     # Configure WildFly

@@ -16,7 +16,7 @@ function Uninstall-WildFly {
     File name:      Uninstall-WildFly.ps1
     Author:         Florian Carrier
     Creation date:  15/12/2019
-    Last modified:  13/01/2020
+    Last modified:  10/02/2020
   #>
   [CmdletBinding (
     SupportsShouldProcess = $true
@@ -98,12 +98,17 @@ function Uninstall-WildFly {
       Write-Log -Type "INFO"  -Object "Removing WildFly files"
       Write-Log -Type "DEBUG" -Object $Properties.JBossHomeDirectory
       # TODO add catch if files are locked
-      Start-Sleep -Seconds 1
+      Start-Sleep -Seconds 3
       Remove-Item -Path $Properties.JBossHomeDirectory -Recurse -Force -Confirm:$Attended -ErrorAction "SilentlyContinue" -ErrorVariable $RemoveErrors
       # Check errors
-      if ($RemoveErrors) {
+      if ($RemoveErrors -Or $Error) {
+        # Output caught errors
         foreach ($RemoveError in $RemoveErrors) {
           Write-Log -Type "DEBUG" -Object $RemoveError
+        }
+        # Output uncaught errors
+        foreach ($UncaughtError in $Error) {
+          Write-Log -Type "DEBUG" -Object $UncaughtError
         }
         Write-Log -Type "ERROR" -Object "Some files could not be removed"
         Write-Log -Type "WARN"  -Object "Please check and manually clear $JBossHome"
