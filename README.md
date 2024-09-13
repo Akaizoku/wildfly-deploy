@@ -1,4 +1,4 @@
-# WildFly deployment utlity
+# WildFly Deploy
 
 `wildfly-deploy` is a small PowerShell utility that offers an automation framework to quickly and easily setup a web-server on a local machine.
 
